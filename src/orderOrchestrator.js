@@ -7,7 +7,6 @@ const orderMessageService = require('./orderMessageService')
 const { accepted, error } = require('./response')
 
 async function processOrder (order) {
-
   try {
     order.orderID = uuid.v4()
     const dbResponse = await orderDB.saveOrder(order)
