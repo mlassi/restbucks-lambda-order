@@ -1,0 +1,54 @@
+service: restbucks-lambda-order
+
+custom:
+  tableName: '${self:provider.stage}-restbucks-order'
+  snsTopic: "${self:provider.stage}-restbucks-order-topic"
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: us-east-1
+  environment:
+    ORDER_TABLE: ${self:custom.tableName}
+    AWS_DEPLOY_REGION: ${self:provider.region}
+    SNS_ORDER_ARN: ${self:custom.snsTopic}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+      Resource:
+        - { "Fn::GetAtt": ["RestbucksOrderDynamoDBTable", "Arn" ] }
+    - Effect: Allow
+      Action:
+        - SNS:Publish
+      Resource:
+        - { "Fn::Join" : [":", ["arn:aws:sns:${self:provider.region}", { "Ref" : "AWS::AccountId" }, "${self:custom.snsTopic}" ] ]  }
+functions:
+  orderHandler:
+    handler: src/orderHandler.handler
+    environment:
+      SNS_TOPIC_ARN: { "Fn::Join" : [":", ["arn:aws:sns:${self:provider.region}", { "Ref" : "AWS::AccountId" }, "${self:custom.snsTopic}" ] ]  }
+    events:
+      - http:
+          path: order
+          method: post
+          cors: true
+      - sns: ${self:provider.stage}-restbucks-order-topic
+
+resources:
+  Resources:
+    RestbucksOrderDynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: orderId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: orderId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.tableName}

@@ -1,0 +1,28 @@
+{
+  "name": "restbucks-lambda-home",
+  "version": "1.0.0",
+  "dependencies": {
+    "lambda-log": "^2.3.1",
+    "uuid": "^7.0.3"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.643.0",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "jasmine": "^3.5.0",
+    "nyc": "^15.0.0"
+  },
+  "scripts": {
+    "test": "nyc --reporter=lcov --reporter=text jasmine",
+    "lint": "eslint src/**/*.js spec/**/**.js spec/*.js"
+  },
+  "nyc": {
+    "exclude": [
+      "spec/**/*"
+    ]
+  }
+}
