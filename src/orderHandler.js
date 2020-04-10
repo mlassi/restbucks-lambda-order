@@ -8,5 +8,4 @@ exports.handler = async function (event) {
   const order = JSON.parse(event.body)
 
   return await orderOrchestrator.processOrder(order)
-  // return {statusCode: 200, body: 'All is going to be OK!'}
 }
